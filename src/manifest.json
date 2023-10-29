@@ -1,0 +1,57 @@
+{
+  "name": "xiaohongshuTool", 
+  "version": "0.0.1",
+  "manifest_version": 3,
+  "description": "Helper Extension",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "xiaohongshu",
+    "default_icon": {
+      "32": "assets/images/xiaohongshu.png"
+    }
+  },
+  "icons": {
+    "16": "assets/images/xiaohongshu.png",
+    "48": "assets/images/xiaohongshu.png",
+    "128": "assets/images/xiaohongshu.png"
+  },
+  "file_system_provider_capabilities": {
+    "configurable": true,
+    "multiple_mounts": true,
+    "source": "network"
+  },
+  "homepage_url": "https://github.com/Mrlhz/crx",
+  "offline_enabled": true,
+  "omnibox": {
+    "keyword": "aString"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "permissions": [
+    "downloads",
+    "contextMenus",
+		"notifications",
+    "bookmarks",
+    "scripting",
+    "activeTab",
+    "tabs",
+    "nativeMessaging",
+    "storage",
+    "webRequest",
+    "offscreen"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [{
+    "runAt": "document_end",
+    "matches": ["http://*/*", "https://*/*"],
+    "js": ["content.js"]
+  }],
+  "web_accessible_resources": [{
+    "resources": ["assets/*", "content.js", "inject.js"],
+    "matches": ["<all_urls>"]
+  }]
+}
