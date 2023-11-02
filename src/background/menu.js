@@ -28,9 +28,11 @@ export const menus = [
 ]
 
 export function menuInit() {
-  menus.forEach(menu => {
-    chrome.runtime.onInstalled.addListener(function() {
-      chrome.contextMenus.create(menu)
+  chrome.runtime.onInstalled.addListener(function() {
+    chrome.contextMenus.removeAll(function() {
+      menus.forEach(menu => {
+        chrome.contextMenus.create(menu)
+      })
     })
   })
 }
