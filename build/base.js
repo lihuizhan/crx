@@ -26,7 +26,9 @@ module.exports = {
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, '../src')
+      '@': path.resolve(__dirname, '../src'),
+      '$/globalConfig': path.resolve(__dirname, '../globalConfig.js'),
+      '$/utils': path.resolve(__dirname, '../utils')
     },
     extensions: [
       '.js',

@@ -51,14 +51,11 @@ function findEntry() {
     entries[dirname] = entryPath
   }
 
-  if (fs.statSync(app_path + ['', 'src', 'content.js'].join(sep)).isFile()) {
-    entries['content'] = app_path + ['', 'src', 'content.js'].join(sep)
+  const contentPath = path.resolve(app_path, 'src', 'content', 'index.js')
+  if (fs.statSync(contentPath).isFile()) {
+    entries['content'] = contentPath
   }
 
-  // if (fs.statSync(app_path + ['', 'src', 'background.js'].join(sep)).isFile()) {
-  //   entries['background'] = app_path + ['', 'src', 'background.js'].join(sep)
-  // }
-  // const backgroundPath = `${app_path}${sep}${['src', 'background', 'index.js'].join(sep)}`
   const backgroundPath = path.join(app_path, 'src', 'background', 'index.js')
   // E:\study\crx-xiaohongshu\src\background\index.js
   if (fs.statSync(backgroundPath).isFile()) {
@@ -69,10 +66,14 @@ function findEntry() {
     entries['devtools'] = app_path + ['', 'src', 'devtools.js'].join(sep)
   }
 
-  // const injectPath = `${app_path}${sep}${['src', 'inject.js'].join(sep)}`
-  const injectPath = path.resolve(app_path, 'src', 'inject.js')
+  const injectPath = path.resolve(app_path, 'src', 'inject', 'index.js')
   if (fs.statSync(injectPath).isFile()) {
     entries['inject'] = injectPath
+  }
+
+  const optionsPath = path.resolve(app_path, 'src', 'options', 'index.js')
+  if (fs.statSync(optionsPath).isFile()) {
+    entries['options'] = optionsPath
   }
 
   return entries
@@ -90,7 +91,7 @@ function genHtmlPlugins() {
     const module_name = modules[index]
     const name = module_name.split('/').pop()
 
-    if (['content', 'background', 'inject', 'contentHtml'].indexOf(module_name) > -1) {
+    if (['content', 'background', 'inject'].indexOf(module_name) > -1) {
       continue
     }
     // 打包对应的模块到指定的目录.其余就不打包了.
