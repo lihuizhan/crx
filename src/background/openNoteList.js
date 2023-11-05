@@ -1,7 +1,15 @@
+import { sleep } from '$/utils/utils'
+import { getOptionsConfig } from '$/utils/config'
 
 export async function openNoteList(tab) {
+  const initConfig = await getOptionsConfig()
   const res = await chrome.storage.local.get(tab.url)
   console.log(res)
+
+  if (!initConfig.openTab) {
+    console.log('任务-停用', initConfig)
+    return
+  }
 
   const list = res[tab.url]
   if (!Array.isArray(list)) {
@@ -23,6 +31,10 @@ export async function openNoteList(tab) {
   console.log('filterList', filterList)
   const total = filterList.length
   while (filterList.length) {
+    const config = await getOptionsConfig()
+    if (!config.openTab) {
+      break
+    }
     const items = filterList.splice(0, 5)
     const tasks = items.map(item => {
       const { id, noteCard } = item

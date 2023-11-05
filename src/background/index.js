@@ -8,12 +8,14 @@ import {
 
 import {
   CONTENT_TO_BACKGROUND,
-  CONTENT_TO_BACKGROUND__LIST
-} from '../../globalConfig'
+  CONTENT_TO_BACKGROUND__LIST,
+  OFFSCREEN_TO_BACKGROUND
+} from '../../globalConfig' // $/globalConfig
 
 import { openNoteList } from './openNoteList.js'
 import { createTab } from './createTab.js'
-import { downloadJSONFile, batchDownloadJSONFile } from './download.js'
+import { batchDownload, downloadJSONFile, batchDownloadJSONFile } from './download.js'
+import { setupOffscreenDocument } from '$/utils/utils'
 
 menuInit()
 
@@ -25,7 +27,10 @@ chrome.contextMenus.onClicked.addListener(async function(info, tab) {
     openNoteList(tab)
   }
   if (menuItemId === X_DOWNLOAD_NOTE_IMAGE) {}
-  if (menuItemId === X_DOWNLOAD_LIST) {}
+  if (menuItemId === X_DOWNLOAD_LIST) {
+    await setupOffscreenDocument()
+    batchDownload(tab)
+  }
 
   if (menuItemId === X_DOWNLOAD_TAB) {
     createTab('./list.html')
@@ -37,25 +42,9 @@ chrome.runtime.onMessage.addListener(async function(request, sender, sendRespons
   const { cmd, url, result, filename } = request
 
   // download json file
-  if (cmd === 'offscreen_to_background') {
-    const { title, name } = result || {}
-    if (!title || !name) {
-      console.log('fail')
-    }
-    const filePath = `${name}/${title}`
-    const filename = `${filePath}.json`
-    chrome.downloads.download({ url: url, filename }).then(downloadId => {
-      return { downloadId }
-    })
-    downloadImage(result)
-  }
-
   // TODO
-  if (cmd === 'offscreen_to_background__batch') {
-    const { filename } = request
-    filename
-      ? downloadJSONFile({ ...request, note: result })
-      : batchDownloadJSONFile({ ...request, note: result })
+  if (cmd === OFFSCREEN_TO_BACKGROUND) {
+    downloadJSONFile({ ...request })
   }
   if (cmd === CONTENT_TO_BACKGROUND) {
     console.log('content-script: ', result)

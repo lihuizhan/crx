@@ -10,11 +10,11 @@ export const menus = [
     'type': 'normal',
     'title': 'open Note List'
   },
-  {
-    'id': X_DOWNLOAD_NOTE_IMAGE,
-    'type': 'normal',
-    'title': 'download Note Image'
-  },
+  // {
+  //   'id': X_DOWNLOAD_NOTE_IMAGE,
+  //   'type': 'normal',
+  //   'title': 'download Note Image'
+  // },
   {
     'id': X_DOWNLOAD_LIST,
     'type': 'normal',
