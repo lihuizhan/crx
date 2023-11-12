@@ -82,3 +82,9 @@ export function formatDate(t) {
 
   return [year, month, day].map(formatNumber).join('-')
 }
+
+export async function getCurrentTab() {
+  const queryOptions = { active: true, currentWindow: true }
+  const [tab] = await chrome.tabs.query(queryOptions)
+  return tab
+}

@@ -51,4 +51,3 @@ window.addEventListener('message', async function(e) {
     await chrome.runtime.sendMessage({ cmd: CONTENT_TO_BACKGROUND__LIST, url: location.href, result: e.data })
   }
 }, false)
-

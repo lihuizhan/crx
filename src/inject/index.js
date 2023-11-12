@@ -1,3 +1,4 @@
+import { throttle } from 'lodash'
 import {
   XHS_HOSTNAME,
   INJECT_TO_CONTENT_SCRIPT,
@@ -47,9 +48,34 @@ function getNoteDetails() {
       note: { ...result }
     }, '*')
   }
+
+  if (note && Object.keys(note).length === 0) {
+    console.log(53, 'empty', note)
+  }
 }
 
-if (location.host.includes(XHS_HOSTNAME)) {
-  getNoteList()
-  getNoteDetails()
+function init() {
+  const elementToObserve = document.querySelector('#global')
+  if (!elementToObserve) {
+    window.setTimeout(init, 1000)
+    return
+  }
+
+  // 创建一个叫 `observer` 的新 `MutationObserver` 实例，
+  // 并将回调函数传给它
+  const _mutationCallback = throttle(mutationCallback, 1000)
+  const observer = new MutationObserver(_mutationCallback)
+
+  // 在 MutationObserver 实例上调用 `observe` 方法，
+  // 并将要观察的元素与选项传给此方法
+  observer.observe(elementToObserve, { subtree: true, childList: true })
 }
+
+function mutationCallback() {
+  if (location.host.includes(XHS_HOSTNAME)) {
+    getNoteList()
+    getNoteDetails()
+  }
+}
+
+init()

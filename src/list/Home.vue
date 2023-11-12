@@ -7,23 +7,26 @@
     </div>
     <el-table ref="multipleTableRef" :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" />
-      <el-table-column label="Date" width="160">
-        <template #default="scope">{{ scope.row.datetime }}</template>
+      <el-table-column label="用户名" width="160">
+        <template #default="{ row }">
+          <div class="links" @click="handleNodeslist(row)">{{ row.user.nickname }}</div>
+        </template>
       </el-table-column>
-      <el-table-column property="tweetText" label="Title" show-overflow-tooltip />
-      <el-table-column property="address" label="Image" width="100">
-        <template #default="{ row }">{{ row.images.length }}</template>
-      </el-table-column>
+      <el-table-column property="nodeCount" label="笔记总数" show-overflow-tooltip />
     </el-table>
   </div>
 </template>
 <script>
 import { ref, toValue } from 'vue'
 import { sleep, safeFileName } from './utils.js'
+import { useRouter, useRoute } from 'vue-router'
 
 export default {
   name: 'ListHome',
-  setup() {
+  setup(props, { attrs, slots, emit, expose }) {
+    const route = useRoute()
+    const router = useRouter()
+    console.log({ route, router })
     const tableData = ref([])
     const multipleTableRef = ref(null)
     const multipleSelection = ref([])
@@ -49,25 +52,30 @@ export default {
     }
     const gallery = new Map()
 
-    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-      console.log('消息：', request, sender, sendResponse)
-      const { cmd, result } = request
-      if (cmd === 'content_script_to_list_tab') {
-        setData(result)
-        console.log({ result }, gallery)
-      }
-      sendResponse({ message: '我是 list，已收到你的消息：', request })
-      return true
-    })
+    async function getList() {
+      const storage = await chrome.storage.local.get(null)
+      const keys = Object.keys(storage)
+      const userKeys = keys.filter(key => key.includes('user/profile'))
+      const list = userKeys
+        .map(key => {
+          return storage[key]
+        })
+        .filter(item => Array.isArray(item) && item.length)
+        .forEach(item => {
+          const { noteCard } = item[0]
+          tableData.value.push({ ...noteCard, nodeCount: item.length })
+        })
+
+      setData(list)
+    }
+    getList()
 
     function setData(data = []) {
-      const filterData = data.filter(item => item.id && item.images.length)
-
-      filterData.forEach(item => {
+      data.forEach(item => {
         const { id } = item
         if (!gallery.has(id)) {
           gallery.set(id, item)
-          tableData.value.push(item)
+          // tableData.value.push(item)
         }
       })
     }
@@ -118,6 +126,12 @@ export default {
       console.log('end')
     }
 
+    function handleNodeslist(row) {
+      const { user } = row
+      const { userId } = user
+      router.push({ path: '/DetailPages', query: { userId }})
+    }
+
     return {
       tableData,
       multipleTableRef,
@@ -125,7 +139,8 @@ export default {
       toggleSelection,
       clearSelection,
       handleSelectionChange,
-      download
+      download,
+      handleNodeslist
     }
   }
 }
@@ -137,6 +152,9 @@ export default {
   .btns {
     margin-top: 20px;
     margin-bottom: 10px;
+  }
+  .links {
+    color: aqua;
   }
 }
 </style>

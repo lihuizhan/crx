@@ -1,4 +1,7 @@
 import { pathParse, safeFileName, sleep, formatDate } from '$/utils/utils'
+import {
+  BACKGROUND_TO_CONTENT__MESSAGE
+} from '$/globalConfig'
 
 /**
  * @description
@@ -17,6 +20,7 @@ export async function getNoteListByKey(key) {
   const list = storage[key]
   if (!Array.isArray(list)) {
     console.log('list null: ', list)
+    await chrome.runtime.sendMessage({ cmd: BACKGROUND_TO_CONTENT__MESSAGE, message: `${key} 无数据` })
     return []
   }
 
@@ -35,8 +39,20 @@ export async function getNoteDetailsList(list = []) {
     .map(({ id }) => `https://www.xiaohongshu.com/explore/${id}`)
 
   const taskList = ids.map(key => chrome.storage.local.get(key))
-  const result = await Promise.all(taskList).then(res => res.flat(1).map(item => Object.values(item)[0]))
-  console.log(result)
+  const res = await Promise.all(taskList).then(res => res.flat(1))
+  const result = []
+  for (let i = 0; i < res.length; i++) {
+    const item = res[i]
+    for (const [key, value] of Object.entries(item)) {
+      if (value && Object.keys(value).length) {
+        result.push(value)
+      } else {
+        console.log({ key, value })
+        await chrome.storage.local.remove(key)
+      }
+    }
+  }
+  console.log(43, result)
   return result
 }
 
@@ -44,7 +60,8 @@ export function getImage(array) {
   const imagesList = []
   for (let index = 0, len = array.length; index < len; index++) {
     const note = array[index]
-    if (!note) {
+    // note 为null或者{}
+    if (!note || !note.user) {
       console.log('continue', note)
       continue
     }
@@ -71,6 +88,8 @@ function getImageByNote(note = {}) {
 
     const { url } = infoItem
     const { name, ext, base } = url.includes('!') ? pathParse(url.split('!')[0]) : pathParse(url)
+    // const matchText = title.match(/[\u4e00-\u9fa5a-zA-Z\d,\.，。]+/)
+    // const text = matchText[0] ? matchText[0] : title
     const safeTitle = `${safeFileName(title)}-${formatDate(time)}__${noteId}`
     return {
       url,

@@ -4,10 +4,14 @@
       <el-form-item label="Activity name">
         <el-input v-model="formData.name" />
       </el-form-item>
-      <el-form-item label="Activity zone">
-        <el-select v-model="formData.region" placeholder="please select your zone">
-          <el-option label="Zone one" value="shanghai" />
-          <el-option label="Zone two" value="beijing" />
+      <el-form-item label="校验下载位置">
+        <el-select v-model="formData.publicDirectory" placeholder="please select" style="width: 100%">
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
         </el-select>
       </el-form-item>
       <el-form-item label="Activity time">
@@ -58,7 +62,7 @@ import { OPTIONS_CONFIG_KEY } from '$/globalConfig'
 const batchOpenTabList = Array.from({ length: 10 }).map((_, i) => i + 1)
 const formData = ref({
   name: '',
-  region: '',
+  publicDirectory: 'D:\\Downloads\\xiaohongshu',
   date1: '',
   date2: '',
   // 是否启用批打开tab页面
@@ -69,10 +73,22 @@ const formData = ref({
   desc: ''
 })
 
+const options = ref([
+  {
+    value: 'D:\\xx\\xiaohongshu',
+    label: 'D:\\xx\\xiaohongshu'
+  },
+  {
+    value: 'E:\\xx\\临时',
+    label: 'E:\\xx\\临时'
+  }
+])
 onMounted(async() => {
   const config = await getOptionsConfig()
-  if (config) {
+  if (config && Object.keys(config).length) {
     formData.value = { ...config }
+  } else {
+    await chrome.storage.local.set({ [OPTIONS_CONFIG_KEY]: formData.value })
   }
 })
 
