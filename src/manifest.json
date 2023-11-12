@@ -1,6 +1,6 @@
 {
   "name": "xiaohongshuTool", 
-  "version": "0.0.1",
+  "version": "0.0.2",
   "manifest_version": 3,
   "description": "Helper Extension",
   "action": {
@@ -39,7 +39,8 @@
     "nativeMessaging",
     "storage",
     "webRequest",
-    "offscreen"
+    "offscreen",
+    "webNavigation"
   ],
   "background": {
     "service_worker": "background.js",

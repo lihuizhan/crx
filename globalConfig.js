@@ -16,6 +16,8 @@ export const CONTENT_TO_BACKGROUND__LIST = 'content_to_background__list'
 
 export const BACKGROUND_TO_OFFSCREEN = 'background_to_offscreen'
 
+export const BACKGROUND_TO_CONTENT__MESSAGE = 'background_to_content__message'
+
 // export const BACKGROUND_TO_OFFSCREEN__BATCH = 'background_to_offscreen__batch'
 
 export const OFFSCREEN_TO_BACKGROUND = 'offscreen_to_background'
