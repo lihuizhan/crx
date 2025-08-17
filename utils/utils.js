@@ -60,7 +60,23 @@ export function pathParse(pathString) {
 }
 
 export function safeFileName(str, replace = '-') {
-  return str.replace(/[\\\/\:\*\?\"\<\>\|]/g, replace)
+  // return str.replace(/[\\\/\:\*\?\"\<\>\|]/g, replace)
+  // str.replace(/[^\u4e00-\u9fa5a-zA-Z0-9，。]/g, '')
+  // str.replace(/[^\u4e00-\u9fa5\u3040-\u309F\u30A0-\u30FF\uFF00-\uFFEFa-zA-Z\s\.,!?;:()\-“”‘’“”\[\]\{\}\/\<\>\@\#\$\%\^\&\*\_\+\=\\\|~`]/g, '');
+
+  // 正则表达式解释：
+  // \p{Script=Han} 匹配汉字
+  // \p{L} 匹配任何字母（包括汉字、拉丁字母等）‌
+  // [a-zA-Z] 匹配英文字母
+  // \d 匹配数字
+  // \p{P} 匹配标点符号（包括全角和半角）
+  // [^...] 匹配不在括号内的任何字符，在这里用于匹配非中英文和非数字标点符号的部分
+  // 全局替换为空字符串，即移除这些字符
+  return str
+    .replace(/[\\\/\:\：\*\?\"\<\>\|]/g, replace)
+    .replace(/[^\p{Script=Han}\p{L}\d\p{P}\s]/gu, '')
+    .replace(/\s+/g, ' ')
+    // .replace(/[^\u4e00-\u9fa5\u3040-\u309F\u30A0-\u30FF\uFF00-\uFFEFa-zA-Z\s\.,!?;()\-“”‘’“”\[\]\{\}\/\<\>\@\#\$\%\^\&\*\_\+\=\\\|~•`]/g, '')
 }
 
 export function sleep(delay) {
